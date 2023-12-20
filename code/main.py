@@ -1,7 +1,6 @@
 import time
 import wandb
 import argparse
-import yaml
 import pandas as pd
 from datetime import datetime
 from src.utils import Logger, Setting, models_load
