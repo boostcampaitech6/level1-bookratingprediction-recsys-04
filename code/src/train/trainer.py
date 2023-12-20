@@ -66,10 +66,9 @@ def train(args, model, dataloader, logger, setting):
 
         if minimum_loss > valid_loss:
             minimum_loss = valid_loss
-            os.makedirs(
-                f'{args.saved_model_path}/{args.timestamp}', exist_ok=True)
+            os.makedirs(args.saved_model_path, exist_ok=True)
             torch.save(model.state_dict(
-            ), f'{args.saved_model_path}/{args.timestamp}/{args.model}_model.pt')
+            ), f'{args.saved_model_path}/{setting.save_time}_{args.model}_model.pt')
     logger.close()
     return model
 
@@ -100,7 +99,7 @@ def test(args, model, dataloader, setting):
     predicts = list()
     if args.use_best_model == True:
         model.load_state_dict(torch.load(
-            f'{args.saved_model_path}/{args.timestamp}/{args.model}_model.pt'))
+            f'./saved_models/{setting.save_time}_{args.model}_model.pt'))
     else:
         pass
     model.eval()

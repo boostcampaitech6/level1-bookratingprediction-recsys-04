@@ -43,11 +43,6 @@ def main(args):
         "cnn_fm_ver": args.cnn_fm_ver,
     }
 
-    timestamp = datetime.today().strftime("%Y%m%d%H%M%S")
-    args.timestamp = datetime.today().strftime("%Y%m%d%H%M%S")
-    wandb.init(id=wandb_id, resume="allow", project=args.project,
-               name=f'{args.model}_{timestamp}', config=config)
-
     # DATA LOAD
     print(f'--------------- {args.model} Load Data ---------------')
     if args.model in ('FM', 'FFM'):
@@ -92,6 +87,10 @@ def main(args):
     logger = Logger(args, log_path)
     logger.save_args()
 
+    # Setting for wandb
+    wandb.init(id=wandb_id, resume="allow", project=args.project,
+               name=setting.get_wandb_name(args), config=config)
+
     # Model
     print(f'--------------- INIT {args.model} ---------------')
     model = models_load(args, data)
@@ -111,6 +110,9 @@ def main(args):
         submission['rating'] = predicts
     else:
         pass
+
+    filename = setting.get_submit_filename(args)
+    submission.to_csv(filename, index=False)
 
 
 if __name__ == "__main__":

@@ -79,6 +79,10 @@ class Setting:
         save_time = now_date + '_' + now_hour.replace(':', '')
         self.save_time = save_time
 
+    def get_wandb_name(self, args):
+        name = f'{self.save_time}_{args.model}'
+        return name
+
     def get_log_path(self, args):
         '''
         [description]
