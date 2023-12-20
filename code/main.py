@@ -15,7 +15,6 @@ def main(args):
     Setting.seed_everything(args.seed)
     global wandb_id
     wandb_id = wandb.util.generate_id()
-
     config = {
         "model" : args.model,
         "data_shuffle" : args.data_shuffle,
