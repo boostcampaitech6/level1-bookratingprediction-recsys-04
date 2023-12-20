@@ -4,23 +4,26 @@ import numpy as np
 from src.ensembles.ensembles import Ensemble
 import argparse
 
+
+
 def main(args):
     file_list = sum(args.ensemble_files, [])
-    
+
     if len(file_list) < 2:
         raise ValueError("Ensemble할 Model을 적어도 2개 이상 입력해 주세요.")
-    
-    en = Ensemble(filenames = file_list,filepath=args.result_path)
+
+    en = Ensemble(filenames=file_list, filepath=args.result_path)
 
     if args.ensemble_strategy == 'weighted':
-        if args.ensemble_weight: 
-            strategy_title = 'sw-'+'-'.join(map(str,*args.ensemble_weight)) #simple weighted
+        if args.ensemble_weight:
+            strategy_title = 'sw-' + \
+                '-'.join(map(str, *args.ensemble_weight))  # simple weighted
             result = en.simple_weighted(*args.ensemble_weight)
         else:
-            strategy_title = 'aw' #average weighted
+            strategy_title = 'aw'  # average weighted
             result = en.average_weighted()
     elif args.ensemble_strategy == 'mixed':
-        strategy_title = args.ensemble_strategy.lower() #mixed
+        strategy_title = args.ensemble_strategy.lower()  # mixed
         result = en.mixed()
     else:
         pass
@@ -28,7 +31,9 @@ def main(args):
     output = en.output_frame.copy()
     files_title = '-'.join(file_list)
 
-    output.to_csv(f'{args.result_path}{strategy_title}-{files_title}.csv',index=False)
+    output.to_csv(
+        f'{args.result_path}{strategy_title}-{files_title}.csv', index=False)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='parser')
@@ -76,16 +81,17 @@ if __name__ == "__main__":
     > mixed : mixed
     '''
 
-    arg("--ensemble_files", nargs='+',required=True,
+    arg("--ensemble_files", nargs='+', required=True,
         type=lambda s: [item for item in s.split(',')],
         help='required: 앙상블할 submit 파일명을 쉼표(,)로 구분하여 모두 입력해 주세요. 이 때, .csv와 같은 확장자는 입력하지 않습니다.')
     arg('--ensemble_strategy', type=str, default='weighted',
-        choices=['weighted','mixed'],
+        choices=['weighted', 'mixed'],
         help='optional: [mixed, weighted] 중 앙상블 전략을 선택해 주세요. (default="weighted")')
-    arg('--ensemble_weight', nargs='+',default=None,
+    arg('--ensemble_weight', nargs='+', default=None,
         type=lambda s: [float(item) for item in s.split(',')],
         help='optional: weighted 앙상블 전략에서 각 결과값의 가중치를 조정할 수 있습니다.')
-    arg('--result_path',type=str, default='./submit/',
+    arg('--result_path', type=str, default='./submit/',
         help='optional: 앙상블할 파일이 존재하는 경로를 전달합니다. (default:"./submit/")')
     args = parser.parse_args()
     main(args)
+
