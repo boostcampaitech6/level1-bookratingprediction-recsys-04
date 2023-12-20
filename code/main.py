@@ -1,6 +1,8 @@
 import time
+import wandb
 import argparse
 import pandas as pd
+from datetime import datetime
 from src.utils import Logger, Setting, models_load
 from src.data import context_data_load, context_data_split, context_data_loader
 from src.data import dl_data_load, dl_data_split, dl_data_loader
@@ -11,7 +13,34 @@ from src.train import train, test
 
 def main(args):
     Setting.seed_everything(args.seed)
-
+    global wandb_id
+    wandb_id = wandb.util.generate_id()
+    config = {
+        "model" : args.model,
+        "data_shuffle" : args.data_shuffle,
+        "batch_size" : args.batch_size,
+        "epochs" : args.epochs,
+        "lr" : args.lr,
+        "loss_fn" : args.loss_fn,
+        "optimizer" : args.optimizer,
+        "weight_decay" : args.weight_decay,
+        "embed_dim" : args.embed_dim,
+        "dropout" : args.dropout,
+        "mlp_dims" : args.mlp_dims,
+        "num_layers" : args.num_layers,
+        "cnn_embed_dim" : args.cnn_embed_dim,
+        "cnn_latent_dim" : args.cnn_latent_dim,
+        "vector_create" : args.vector_create,
+        "deepconn_embed_dim" : args.deepconn_embed_dim,
+        "deepconn_latent_dim" : args.deepconn_latent_dim,
+        "conv_1d_out_dim" : args.conv_1d_out_dim,
+        "kernel_size" : args.kernel_size,
+        "word_dim" : args.word_dim,
+        "out_dim" : args.out_dim
+    }
+    
+    timestamp = datetime.today().strftime("%Y%m%d%H%M%S")
+    wandb.init(id = wandb_id, resume = "allow", project= arg.project, name = f'{args.model}_{timestamp}', config = config)
 
     ######################## DATA LOAD
     print(f'--------------- {args.model} Load Data ---------------')
@@ -58,7 +87,6 @@ def main(args):
     logger = Logger(args, log_path)
     logger.save_args()
 
-
     ######################## Model
     print(f'--------------- INIT {args.model} ---------------')
     model = models_load(args,data)
@@ -93,6 +121,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='parser')
     arg = parser.add_argument
 
+    ############### WANDB OPTION
+    arg('--project', type=str, default='DCN-parallel mlp_dims, lr', help='프로젝트 이름을 설정할 수 있습니다.')
+    #arg('--entity', type=str, default='recsys4', required=True, help='Username 이나 Team name 을 설정할 수 있습니다.')
 
     ############### BASIC OPTION
     arg('--data_path', type=str, default='data/', help='Data path를 설정할 수 있습니다.')
