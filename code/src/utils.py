@@ -76,8 +76,8 @@ class Setting:
         now = time.localtime()
         now_date = time.strftime('%Y%m%d', now)
         now_hour = time.strftime('%X', now)
-        # save_time = now_date + '_' + now_hour.replace(':', '')
-        # self.save_time = save_time
+        save_time = now_date + '_' + now_hour.replace(':', '')
+        self.save_time = save_time
 
     def get_log_path(self, args):
         '''
@@ -91,7 +91,7 @@ class Setting:
         path : log file을 저장할 경로를 반환합니다.
         이 때, 경로는 log/날짜_시간_모델명/ 입니다.
         '''
-        path = f'./log/{args.timestamp}_{args.model}/'
+        path = f'./log/{self.save_time}_{args.model}/'
         return path
 
     def get_submit_filename(self, args):
@@ -106,7 +106,7 @@ class Setting:
         filename : submit file을 저장할 경로를 반환합니다.
         이 때, 파일명은 submit/날짜_시간_모델명.csv 입니다.
         '''
-        filename = f'./submit/{args.timestamp}_{args.model}.csv'
+        filename = f'./submit/{self.save_time}_{args.model}.csv'
         return filename
 
     def make_dir(self, path):
