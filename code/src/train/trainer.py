@@ -44,6 +44,8 @@ def train(args, model, dataloader, logger, setting):
                 x, y = [data['user_isbn_vector'].to(args.device), data['img_vector'].to(args.device)], data['label'].to(args.device)
             elif args.model == 'DeepCoNN':
                 x, y = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)
+            elif args.model == 'ROP_CNN':
+                x, y = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)    
             else:
                 x, y = data[0].to(args.device), data[1].to(args.device)
             y_hat = model(x)
@@ -76,6 +78,8 @@ def valid(args, model, dataloader, loss_fn):
             x, y = [data['user_isbn_vector'].to(args.device), data['img_vector'].to(args.device)], data['label'].to(args.device)
         elif args.model == 'DeepCoNN':
             x, y = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)
+        elif args.model == 'ROP_CNN':
+            x, y = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)        
         else:
             x, y = data[0].to(args.device), data[1].to(args.device)
         y_hat = model(x)
@@ -99,6 +103,8 @@ def test(args, model, dataloader, setting):
             x, _ = [data['user_isbn_vector'].to(args.device), data['img_vector'].to(args.device)], data['label'].to(args.device)
         elif args.model == 'DeepCoNN':
             x, _ = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)
+        elif args.model == 'ROP_CNN':
+            x, _ = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)            
         else:
             x = data[0].to(args.device)
         y_hat = model(x)
