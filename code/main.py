@@ -38,6 +38,7 @@ def main(args):
         "word_dim": args.word_dim,
         "out_dim": args.out_dim,
         "clean_img_ver": args.clean_img_ver,
+        "img_resize": args.img_resize,
         "img_transforms": args.img_transforms,
         "cnn_fm_ver": args.cnn_fm_ver,
     }
