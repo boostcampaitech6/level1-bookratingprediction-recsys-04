@@ -11,7 +11,6 @@ class RMSELoss(nn.Module):
     def __init__(self):
         super(RMSELoss, self).__init__()
         self.eps = 1e-6
-
     def forward(self, x, y):
         criterion = MSELoss()
         loss = torch.sqrt(criterion(x, y)+self.eps)
@@ -32,7 +31,7 @@ def train(args, model, dataloader, logger, setting):
         optimizer = Adam(model.parameters(), lr=args.lr)
     else:
         pass
-
+      
     wandb.watch(models=model, criterion=loss_fn, log='all')
 
     for epoch in tqdm.tqdm(range(args.epochs)):
@@ -42,11 +41,11 @@ def train(args, model, dataloader, logger, setting):
 
         for idx, data in enumerate(dataloader['train_dataloader']):
             if args.model == 'CNN_FM':
-                x, y = [data['user_isbn_vector'].to(args.device), data['img_vector'].to(
-                    args.device)], data['label'].to(args.device)
+                x, y = [data['user_isbn_vector'].to(args.device), data['img_vector'].to(args.device)], data['label'].to(args.device)
             elif args.model == 'DeepCoNN':
-                x, y = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(
-                    args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)
+                x, y = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)
+            elif args.model == 'ROP_CNN':
+                x, y = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)    
             else:
                 x, y = data[0].to(args.device), data[1].to(args.device)
 
@@ -80,11 +79,11 @@ def valid(args, model, dataloader, loss_fn):
 
     for idx, data in enumerate(dataloader['valid_dataloader']):
         if args.model == 'CNN_FM':
-            x, y = [data['user_isbn_vector'].to(args.device), data['img_vector'].to(
-                args.device)], data['label'].to(args.device)
+            x, y = [data['user_isbn_vector'].to(args.device), data['img_vector'].to(args.device)], data['label'].to(args.device)
         elif args.model == 'DeepCoNN':
-            x, y = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(
-                args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)
+            x, y = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)
+        elif args.model == 'ROP_CNN':
+            x, y = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)       
         else:
             x, y = data[0].to(args.device), data[1].to(args.device)
         y_hat = model(x)
@@ -106,11 +105,11 @@ def test(args, model, dataloader, setting):
 
     for idx, data in enumerate(dataloader['test_dataloader']):
         if args.model == 'CNN_FM':
-            x, _ = [data['user_isbn_vector'].to(args.device), data['img_vector'].to(
-                args.device)], data['label'].to(args.device)
+            x, _ = [data['user_isbn_vector'].to(args.device), data['img_vector'].to(args.device)], data['label'].to(args.device)
         elif args.model == 'DeepCoNN':
-            x, _ = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(
-                args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)
+            x, _ = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)
+        elif args.model == 'ROP_CNN':
+            x, _ = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)            
         else:
             x = data[0].to(args.device)
         y_hat = model(x)

@@ -55,10 +55,15 @@ def main(args):
         import nltk
         nltk.download('punkt')
         data = text_data_load(args)
+    elif args.model == 'ROP_CNN':
+        import nltk
+        nltk.download('punkt')
+        data = text_data_load(args)    
     else:
         pass
 
     # Train/Valid Split
+
     print(f'--------------- {args.model} Train/Valid Split ---------------')
     if args.model in ('FM', 'FFM'):
         data = context_data_split(args, data)
@@ -68,15 +73,20 @@ def main(args):
         data = dl_data_split(args, data)
         data = dl_data_loader(args, data)
 
-    elif args.model == 'CNN_FM':
+    elif args.model=='CNN_FM':
         data = image_data_split(args, data)
         data = image_data_loader(args, data)
 
-    elif args.model == 'DeepCoNN':
+    elif args.model=='DeepCoNN':
+        data = text_data_split(args, data)
+        data = text_data_loader(args, data)
+        
+    elif args.model=='ROP_CNN':
         data = text_data_split(args, data)
         data = text_data_loader(args, data)
     else:
         pass
+
 
     # Setting for Log
     setting = Setting()
@@ -86,27 +96,26 @@ def main(args):
 
     logger = Logger(args, log_path)
     logger.save_args()
-
-    # Setting for wandb
-    wandb.init(id=wandb_id, resume="allow", project=args.project,
-               name=setting.get_wandb_name(args), config=config)
-
-    # Model
+    
+    ######################## Model
     print(f'--------------- INIT {args.model} ---------------')
-    model = models_load(args, data)
+    model = models_load(args,data)
 
-    # TRAIN
+
+    ######################## TRAIN
     print(f'--------------- {args.model} TRAINING ---------------')
     model = train(args, model, data, logger, setting)
 
-    # INFERENCE
+
+    ######################## INFERENCE
     print(f'--------------- {args.model} PREDICT ---------------')
     predicts = test(args, model, data, setting)
 
-    # SAVE PREDICT
+
+    ######################## SAVE PREDICT
     print(f'--------------- SAVE {args.model} PREDICT ---------------')
     submission = pd.read_csv(args.data_path + 'sample_submission.csv')
-    if args.model in ('FM', 'FFM', 'NCF', 'WDN', 'DCN', 'CNN_FM', 'DeepCoNN'):
+    if args.model in ('FM', 'FFM', 'NCF', 'WDN', 'DCN', 'CNN_FM', 'DeepCoNN', 'ROP_CNN'):
         submission['rating'] = predicts
     else:
         pass
@@ -116,6 +125,7 @@ def main(args):
 
 
 if __name__ == "__main__":
+
 
     # BASIC ENVIRONMENT SETUP
     parser = argparse.ArgumentParser(description='parser')
@@ -182,21 +192,21 @@ if __name__ == "__main__":
         help='CNN_FM에서 user/item/image에 대한 latent 차원을 조정할 수 있습니다.')
     arg('--cnn_fm_ver', type=int, default=1, help='CNN_FM 버전')
 
-    # DeepCoNN
+    # DeepCoNN & ROP_CNN
     arg('--vector_create', type=bool, default=False,
-        help='DEEP_CONN에서 text vector 생성 여부를 조정할 수 있으며 최초 학습에만 True로 설정하여야합니다.')
+        help='DEEP_CONN,ROP_CNN에서 text vector 생성 여부를 조정할 수 있으며 최초 학습에만 True로 설정하여야합니다.')
     arg('--deepconn_embed_dim', type=int, default=32,
-        help='DEEP_CONN에서 user와 item에 대한 embedding시킬 차원을 조정할 수 있습니다.')
+        help='DEEP_CONN,ROP_CNN에서 user와 item에 대한 embedding시킬 차원을 조정할 수 있습니다.')
     arg('--deepconn_latent_dim', type=int, default=10,
-        help='DEEP_CONN에서 user/item/image에 대한 latent 차원을 조정할 수 있습니다.')
+        help='DEEP_CONN,ROP_CNN에서 user/item/image에 대한 latent 차원을 조정할 수 있습니다.')
     arg('--conv_1d_out_dim', type=int, default=50,
-        help='DEEP_CONN에서 1D conv의 출력 크기를 조정할 수 있습니다.')
+        help='DEEP_CONN,ROP_CNN에서 1D conv의 출력 크기를 조정할 수 있습니다.')
     arg('--kernel_size', type=int, default=3,
-        help='DEEP_CONN에서 1D conv의 kernel 크기를 조정할 수 있습니다.')
+        help='DEEP_CONN,ROP_CNN에서 1D conv의 kernel 크기를 조정할 수 있습니다.')
     arg('--word_dim', type=int, default=768,
-        help='DEEP_CONN에서 1D conv의 입력 크기를 조정할 수 있습니다.')
+        help='DEEP_CONN,ROP_CNN에서 1D conv의 입력 크기를 조정할 수 있습니다.')
     arg('--out_dim', type=int, default=32,
-        help='DEEP_CONN에서 1D conv의 출력 크기를 조정할 수 있습니다.')
+        help='DEEP_CONN,ROP_CNN에서 1D conv의 출력 크기를 조정할 수 있습니다.')
 
     args = parser.parse_args()
     main(args)
