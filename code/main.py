@@ -40,7 +40,7 @@ def main(args):
     }
     
     timestamp = datetime.today().strftime("%Y%m%d%H%M%S")
-    wandb.init(id = wandb_id, resume = "allow", project= args.project, name = f'{args.model}_{timestamp}', config = config)    # 일단 entity=args.entity 제외
+    wandb.init(id = wandb_id, resume = "allow", project= arg.project, name = f'{args.model}_{timestamp}', config = config)
 
     ######################## DATA LOAD
     print(f'--------------- {args.model} Load Data ---------------')
