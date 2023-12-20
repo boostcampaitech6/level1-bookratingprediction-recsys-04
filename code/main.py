@@ -122,8 +122,8 @@ if __name__ == "__main__":
     arg = parser.add_argument
 
     ############### WANDB OPTION
-    arg('--project', type=str, default='DCN-parallel mlp_dims, lr', help='프로젝트 이름을 설정할 수 있습니다.')
-    #arg('--entity', type=str, default='recsys4', required=True, help='Username 이나 Team name 을 설정할 수 있습니다.')
+    arg('--project', type=str, default='book_project', help='프로젝트 이름을 설정할 수 있습니다.')
+    # arg('--entity', type=str, default='recsys4', required=True, help='Username 이나 Team name 을 설정할 수 있습니다.')
 
     ############### BASIC OPTION
     arg('--data_path', type=str, default='data/', help='Data path를 설정할 수 있습니다.')
@@ -166,7 +166,7 @@ if __name__ == "__main__":
 
     ############### DeepCoNN
     arg('--vector_create', type=bool, default=False, help='DEEP_CONN에서 text vector 생성 여부를 조정할 수 있으며 최초 학습에만 True로 설정하여야합니다.')
-    arg('--deepconn_embed_dim', type=int, default=32, help='DEEP_CONN에서 user와 item에 대한 embedding시킬 차원을 조정할 수 있습니다.')
+    arg('--deepconn_embed_dim', type=int, default=64, help='DEEP_CONN에서 user와 item에 대한 embedding시킬 차원을 조정할 수 있습니다.')
     arg('--deepconn_latent_dim', type=int, default=10, help='DEEP_CONN에서 user/item/image에 대한 latent 차원을 조정할 수 있습니다.')
     arg('--conv_1d_out_dim', type=int, default=50, help='DEEP_CONN에서 1D conv의 출력 크기를 조정할 수 있습니다.')
     arg('--kernel_size', type=int, default=3, help='DEEP_CONN에서 1D conv의 kernel 크기를 조정할 수 있습니다.')

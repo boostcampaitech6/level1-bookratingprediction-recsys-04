@@ -13,6 +13,9 @@ import isbnlib
 from sklearn.preprocessing import LabelEncoder
 
 
+
+# feat siyun - age의 category 범위를 9까지 증가
+# 그 외 남아있을 null, nan값은 9로 치환합니다.
 def age_map(x: int) -> int:
     if pd.isnull(x) :
         return 9
@@ -61,6 +64,7 @@ def process_context_data(users, books, ratings1, ratings2):
     - categorize_and_encode(x) : 지정해 놓은 n개의 category를 바탕으로 해당하는 부분을 category_high 칼럼으로 새롭게 받아 Label_encoding
     args를 받아 진행하고 싶었지만, 본 함수에서는 arg를 받지 않기 때문에 다음과 같이 강제로 추가하는 방식을 일단 진행하였습니다. 추후 변경 예정.
     """
+
 
     users['location_city'] = users['location'].apply(lambda x: x.split(',')[0])
     users['location_state'] = users['location'].apply(lambda x: x.split(',')[1])
@@ -129,7 +133,7 @@ def process_context_data(users, books, ratings1, ratings2):
     test_df['language'] = test_df['language'].map(language2idx)
     test_df['book_author'] = test_df['book_author'].map(author2idx)
 
-    # idx에 새로 추가한 칼럼 category_high, category_high_encode를 추가했습니다.
+    # feat siyun - idx에 새로 추가한 칼럼 category_high_encode를 추가했습니다.
     # idx['category_~~]를 넣으면 그 값으로 LabelEncoding이 반환됩니다.
     idx = {
         "loc_city2idx":loc_city2idx,
@@ -154,21 +158,6 @@ def context_data_load(args):
             데이터 경로
     ----------
     """
-    # feat siyun : 여기서 추가적으로 생성한 칼럼을 같이 처리하는 방안이 필요.
-    '''
-    작업처리
-    : 새로 만들 columns을 idx화 
-    category_high, age_cat은 이미 idx화가 된거라 그냥 집어넣을면 되겠음.
-    -----
-    작업 진행 후 field_dim에 추가
-    
-    '''
-    # # feat siyun : args.model 이 FFM이면 새롭게 age_map을 정의합니다.
-    # if args.model == 'FFM' :
-    #     age_map = ffm_age_map
-
-    
-    # ###------------------------
     
     ######################## DATA LOAD
     users = pd.read_csv(args.data_path + 'users.csv')
