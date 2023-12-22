@@ -42,6 +42,10 @@ def main(args):
         "img_transforms": args.img_transforms,
         "cnn_fm_ver": args.cnn_fm_ver,
     }
+    timestamp = datetime.today().strftime("%Y%m%d%H%M%S")
+    wandb.init(id = wandb_id, resume = "allow", project= args.project, name = f'{args.model}_{timestamp}', config = config, entity=args.entity)
+
+
 
     # DATA LOAD
     print(f'--------------- {args.model} Load Data ---------------')
@@ -149,7 +153,7 @@ if __name__ == "__main__":
     arg('--data_path', type=str, default='data/', help='Data path를 설정할 수 있습니다.')
     arg('--saved_model_path', type=str, default='./saved_models',
         help='Saved Model path를 설정할 수 있습니다.')
-    arg('--model', type=str, choices=['FM', 'FFM', 'NCF', 'WDN', 'DCN', 'CNN_FM', 'DeepCoNN'],
+    arg('--model', type=str, choices=['FM', 'FFM', 'NCF', 'WDN', 'DCN', 'CNN_FM', 'DeepCoNN', 'ROP_CNN'],
         help='학습 및 예측할 모델을 선택할 수 있습니다.')
     arg('--data_shuffle', type=bool, default=True, help='데이터 셔플 여부를 조정할 수 있습니다.')
     arg('--test_size', type=float, default=0.2,

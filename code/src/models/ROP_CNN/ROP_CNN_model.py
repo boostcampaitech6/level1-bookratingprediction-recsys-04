@@ -38,7 +38,7 @@ class CNN_1D(nn.Module):
         super(CNN_1D, self).__init__()
         self.conv = nn.Sequential(
                                 nn.Conv1d(  ##Convolution
-                                        in_channels=1,#word_dim,  #입력 데이터의 차원 수
+                                        in_channels=5,#word_dim,  #입력 데이터의 차원 수
                                         out_channels=out_dim,  #출력 데이터의 차원 수
                                         kernel_size=kernel_size,  #커널의 크기
                                         padding=(kernel_size - 1) // 2),
@@ -46,6 +46,7 @@ class CNN_1D(nn.Module):
                                 nn.MaxPool1d(kernel_size=kernel_size), ##Max-pooling
                                 nn.Dropout(p=0.5)
                                     )
+        self.bn = nn.BatchNorm1d(out_dim)
         self.linear = nn.Sequential(  ##Fully Connected
                                     nn.Linear(out_dim * (word_dim // kernel_size), conv_1d_out_dim), #Multiple 지점
                                     nn.ReLU(),
@@ -53,6 +54,7 @@ class CNN_1D(nn.Module):
                                     )
     def forward(self, vec):
         output = self.conv(vec)
+        output = self.bn(output)
         output = output.reshape(output.size(0), -1) 
         output = self.linear(output)
         return output
@@ -71,6 +73,7 @@ class CNN_2D(nn.Module):
                                 nn.MaxPool2d(kernel_size=kernel_size),
                                 nn.Dropout(p=0.5)
                                     )
+        self.bn = nn.BatchNorm2d(out_channels)
         self.linear = nn.Sequential(
                                     nn.Linear(out_channels * (100 // kernel_size) * (100 // kernel_size), conv_2d_out_dim), #Multiple 지점
                                     nn.ReLU(),
@@ -78,6 +81,7 @@ class CNN_2D(nn.Module):
                                     )
     def forward(self, x):
         x = self.conv(x)
+        x = self.bn(x)
         x = x.view(x.size(0), -1) 
         x = self.linear(x)
         return x
@@ -104,7 +108,7 @@ class ROP_CNN(nn.Module):
         self.item_factors = nn.Parameter(torch.from_numpy(svd.components_.T).float())
 
         self.cnn_u = CNN_2D( #interaction encoder의 2D CNN
-                             in_channels=1,
+                             in_channels=5,
                              out_channels=args.out_dim,
                              kernel_size=args.kernel_size,
                              conv_2d_out_dim=args.conv_1d_out_dim,
@@ -127,6 +131,7 @@ class ROP_CNN(nn.Module):
         
         ## Review Text Encoder
         item_text_vector = item_text_vector.permute(0,2,1)  # item_text_vector : Batch수(1024)*embedding 수(768)*1
+        item_text_vector = item_text_vector.repeat(1, 5, 1)
         item_text_feature = self.cnn_i(item_text_vector) 
         
         ## Interaction Encoder
@@ -140,7 +145,7 @@ class ROP_CNN(nn.Module):
         interaction_map = torch.bmm(user_factor_batch.unsqueeze(2), item_factor_batch.unsqueeze(1))
         # 상호작용 맵의 차원을 [batch_size, height, width]에서 [batch_size, 3, height, width]로 변경
         interaction_map = interaction_map.unsqueeze(1)  # 먼저 채널 차원을 추가합니다.
-        #interaction_map = interaction_map.repeat(1, 3, 1, 1)  # 채널 차원을 3으로 확장합니다.
+        interaction_map = interaction_map.repeat(1, 5, 1, 1)  # 채널 차원을 3으로 확장합니다.
         # 상호작용 맵을 3D CNN에 입력
         interaction_feature = self.cnn_u(interaction_map)
         
