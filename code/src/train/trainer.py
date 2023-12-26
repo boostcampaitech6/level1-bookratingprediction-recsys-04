@@ -48,8 +48,9 @@ def train(args, model, dataloader, logger, setting):
                 x, y = [data['user_isbn_vector'].to(args.device), data['img_vector'].to(
                     args.device)], data['label'].to(args.device)
             elif args.model == 'DeepCoNN':
-                x, y = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(
-                    args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)
+                x, y = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)
+            elif args.model == 'ROP_CNN':
+                x, y = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)    
             else:
                 x, y = data[0].to(args.device), data[1].to(args.device)
 
@@ -65,6 +66,7 @@ def train(args, model, dataloader, logger, setting):
         lr_now = lr_sched.get_last_lr()
         print(
             f'Epoch: {epoch+1}, Train_loss: {total_loss/batch:.3f}, valid_loss: {valid_loss:.3f}, lr: {lr_now}')
+
         logger.log(epoch=epoch+1, train_loss=total_loss /
                    batch, valid_loss=valid_loss)
         wandb.log({'Train_loss': total_loss/batch, 'valid_loss': valid_loss})
@@ -88,8 +90,9 @@ def valid(args, model, dataloader, loss_fn):
             x, y = [data['user_isbn_vector'].to(args.device), data['img_vector'].to(
                 args.device)], data['label'].to(args.device)
         elif args.model == 'DeepCoNN':
-            x, y = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(
-                args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)
+            x, y = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)
+        elif args.model == 'ROP_CNN':
+            x, y = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)       
         else:
             x, y = data[0].to(args.device), data[1].to(args.device)
         y_hat = model(x)
@@ -114,8 +117,9 @@ def test(args, model, dataloader, setting):
             x, _ = [data['user_isbn_vector'].to(args.device), data['img_vector'].to(
                 args.device)], data['label'].to(args.device)
         elif args.model == 'DeepCoNN':
-            x, _ = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(
-                args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)
+            x, _ = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)
+        elif args.model == 'ROP_CNN':
+            x, _ = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)            
         else:
             x = data[0].to(args.device)
         y_hat = model(x)

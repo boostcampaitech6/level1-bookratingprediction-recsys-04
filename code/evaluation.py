@@ -5,12 +5,10 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_squared_error
 
-
 def rmse(y, pred):
     y, pred = y.values, pred.values
     mse = np.mean((y-pred)**2)
     return mse**0.5
-
 
 def evaluation(gt_path, pred_path):
     """

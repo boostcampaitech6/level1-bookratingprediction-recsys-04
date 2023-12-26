@@ -16,6 +16,7 @@ def main(args):
     global wandb_id
     wandb_id = wandb.util.generate_id()
     config = {
+
         "model": args.model,
         "data_shuffle": args.data_shuffle,
         "batch_size": args.batch_size,
@@ -43,6 +44,9 @@ def main(args):
         "cnn_fm_ver": args.cnn_fm_ver,
     }
 
+    timestamp = datetime.today().strftime("%Y%m%d%H%M%S")
+    wandb.init(id = wandb_id, resume = "allow", project= args.project, name = f'{args.model}_{timestamp}', config = config, entity=args.entity)
+
     # DATA LOAD
     print(f'--------------- {args.model} Load Data ---------------')
     if args.model in ('FM', 'FFM'):
@@ -55,6 +59,11 @@ def main(args):
         import nltk
         nltk.download('punkt')
         data = text_data_load(args)
+
+    elif args.model == 'ROP_CNN':
+        import nltk
+        nltk.download('punkt')
+        data = text_data_load(args)    
     else:
         pass
 
@@ -73,6 +82,11 @@ def main(args):
         data = image_data_loader(args, data)
 
     elif args.model == 'DeepCoNN':
+        data = text_data_split(args, data)
+        data = text_data_loader(args, data)
+
+        
+    elif args.model=='ROP_CNN':
         data = text_data_split(args, data)
         data = text_data_loader(args, data)
     else:
@@ -106,7 +120,9 @@ def main(args):
     # SAVE PREDICT
     print(f'--------------- SAVE {args.model} PREDICT ---------------')
     submission = pd.read_csv(args.data_path + 'sample_submission.csv')
-    if args.model in ('FM', 'FFM', 'NCF', 'WDN', 'DCN', 'CNN_FM', 'DeepCoNN'):
+
+    if args.model in ('FM', 'FFM', 'NCF', 'WDN', 'DCN', 'CNN_FM', 'DeepCoNN', 'ROP_CNN'):
+
         submission['rating'] = predicts
     else:
         pass
@@ -139,7 +155,7 @@ if __name__ == "__main__":
     arg('--data_path', type=str, default='data/', help='Data path를 설정할 수 있습니다.')
     arg('--saved_model_path', type=str, default='./saved_models',
         help='Saved Model path를 설정할 수 있습니다.')
-    arg('--model', type=str, choices=['FM', 'FFM', 'NCF', 'WDN', 'DCN', 'CNN_FM', 'DeepCoNN'],
+    arg('--model', type=str, choices=['FM', 'FFM', 'NCF', 'WDN', 'DCN', 'CNN_FM', 'DeepCoNN', 'ROP_CNN'],
         help='학습 및 예측할 모델을 선택할 수 있습니다.')
     arg('--data_shuffle', type=bool, default=True, help='데이터 셔플 여부를 조정할 수 있습니다.')
     arg('--test_size', type=float, default=0.2,
@@ -182,21 +198,21 @@ if __name__ == "__main__":
         help='CNN_FM에서 user/item/image에 대한 latent 차원을 조정할 수 있습니다.')
     arg('--cnn_fm_ver', type=int, default=1, help='CNN_FM 버전')
 
-    # DeepCoNN
+    # DeepCoNN & ROP_CNN
     arg('--vector_create', type=bool, default=False,
-        help='DEEP_CONN에서 text vector 생성 여부를 조정할 수 있으며 최초 학습에만 True로 설정하여야합니다.')
+        help='DEEP_CONN,ROP_CNN에서 text vector 생성 여부를 조정할 수 있으며 최초 학습에만 True로 설정하여야합니다.')
     arg('--deepconn_embed_dim', type=int, default=32,
-        help='DEEP_CONN에서 user와 item에 대한 embedding시킬 차원을 조정할 수 있습니다.')
+        help='DEEP_CONN,ROP_CNN에서 user와 item에 대한 embedding시킬 차원을 조정할 수 있습니다.')
     arg('--deepconn_latent_dim', type=int, default=10,
-        help='DEEP_CONN에서 user/item/image에 대한 latent 차원을 조정할 수 있습니다.')
+        help='DEEP_CONN,ROP_CNN에서 user/item/image에 대한 latent 차원을 조정할 수 있습니다.')
     arg('--conv_1d_out_dim', type=int, default=50,
-        help='DEEP_CONN에서 1D conv의 출력 크기를 조정할 수 있습니다.')
+        help='DEEP_CONN,ROP_CNN에서 1D conv의 출력 크기를 조정할 수 있습니다.')
     arg('--kernel_size', type=int, default=3,
-        help='DEEP_CONN에서 1D conv의 kernel 크기를 조정할 수 있습니다.')
+        help='DEEP_CONN,ROP_CNN에서 1D conv의 kernel 크기를 조정할 수 있습니다.')
     arg('--word_dim', type=int, default=768,
-        help='DEEP_CONN에서 1D conv의 입력 크기를 조정할 수 있습니다.')
+        help='DEEP_CONN,ROP_CNN에서 1D conv의 입력 크기를 조정할 수 있습니다.')
     arg('--out_dim', type=int, default=32,
-        help='DEEP_CONN에서 1D conv의 출력 크기를 조정할 수 있습니다.')
+        help='DEEP_CONN,ROP_CNN에서 1D conv의 출력 크기를 조정할 수 있습니다.')
 
     args = parser.parse_args()
     main(args)

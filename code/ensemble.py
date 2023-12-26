@@ -5,7 +5,6 @@ from src.ensembles.ensembles import Ensemble
 import argparse
 import os
 
-
 def main(args):
     file_list = sum(args.ensemble_files, [])
 
