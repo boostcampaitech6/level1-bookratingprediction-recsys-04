@@ -8,6 +8,7 @@ import logging
 import json
 from .models import *
 
+
 def rmse(real: list, predict: list) -> float:
     '''
     [description]
@@ -34,22 +35,25 @@ def models_load(args, data):
     data : data는 data_loader로 처리된 데이터를 의미합니다.
     '''
 
-    if args.model=='FM':
+    if args.model == 'FM':
         model = FactorizationMachineModel(args, data).to(args.device)
-    elif args.model=='FFM':
+    elif args.model == 'FFM':
         model = FieldAwareFactorizationMachineModel(args, data).to(args.device)
-    elif args.model=='NCF':
+    elif args.model == 'NCF':
         model = NeuralCollaborativeFiltering(args, data).to(args.device)
-    elif args.model=='WDN':
+    elif args.model == 'WDN':
         model = WideAndDeepModel(args, data).to(args.device)
-    elif args.model=='DCN':
+    elif args.model == 'DCN':
         model = DeepCrossNetworkModel(args, data).to(args.device)
-    elif args.model=='CNN_FM':
+    elif args.model == 'CNN_FM':
         model = CNN_FM(args, data).to(args.device)
-    elif args.model=='DeepCoNN':
+    elif args.model == 'DeepCoNN':
         model = DeepCoNN(args, data).to(args.device)
+    elif args.model=='ROP_CNN':
+        model = ROP_CNN(args, data).to(args.device)        
     else:
-        raise ValueError('MODEL is not exist : select model in [FM,FFM,NCF,WDN,DCN,CNN_FM,DeepCoNN]')
+        raise ValueError(
+            'MODEL is not exist : select model in [FM,FFM,NCF,WDN,DCN,CNN_FM,DeepCoNN]')
     return model
 
 
@@ -76,6 +80,10 @@ class Setting:
         now_hour = time.strftime('%X', now)
         save_time = now_date + '_' + now_hour.replace(':', '')
         self.save_time = save_time
+
+    def get_wandb_name(self, args):
+        name = f'{self.save_time}_{args.model}'
+        return name
 
     def get_log_path(self, args):
         '''
@@ -107,7 +115,7 @@ class Setting:
         filename = f'./submit/{self.save_time}_{args.model}.csv'
         return filename
 
-    def make_dir(self,path):
+    def make_dir(self, path):
         '''
         [description]
         경로가 존재하지 않을 경우 해당 경로를 생성하며, 존재할 경우 pass를 하는 함수입니다.
@@ -177,7 +185,8 @@ class Logger:
         argparse_dict = self.args.__dict__
 
         with open(f'{self.path}/model.json', 'w') as f:
-            json.dump(argparse_dict,f,indent=4)
+            json.dump(argparse_dict, f, indent=4)
 
     def __del__(self):
         self.close()
+        
