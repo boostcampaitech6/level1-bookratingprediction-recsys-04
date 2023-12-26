@@ -45,4 +45,3 @@ def evaluation(gt_path, pred_path):
     # }
 
     return results
-  

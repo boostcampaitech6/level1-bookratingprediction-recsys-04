@@ -11,6 +11,7 @@ class RMSELoss(nn.Module):
     def __init__(self):
         super(RMSELoss, self).__init__()
         self.eps = 1e-6
+
     def forward(self, x, y):
         criterion = MSELoss()
         loss = torch.sqrt(criterion(x, y)+self.eps)
@@ -31,7 +32,10 @@ def train(args, model, dataloader, logger, setting):
         optimizer = Adam(model.parameters(), lr=args.lr)
     else:
         pass
-      
+
+    lr_sched = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
+        optimizer, T_0=1, T_mult=1, eta_min=0.01, last_epoch=-1)
+
     wandb.watch(models=model, criterion=loss_fn, log='all')
 
     for epoch in tqdm.tqdm(range(args.epochs)):
@@ -41,7 +45,8 @@ def train(args, model, dataloader, logger, setting):
 
         for idx, data in enumerate(dataloader['train_dataloader']):
             if args.model == 'CNN_FM':
-                x, y = [data['user_isbn_vector'].to(args.device), data['img_vector'].to(args.device)], data['label'].to(args.device)
+                x, y = [data['user_isbn_vector'].to(args.device), data['img_vector'].to(
+                    args.device)], data['label'].to(args.device)
             elif args.model == 'DeepCoNN':
                 x, y = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)
             elif args.model == 'ROP_CNN':
@@ -53,12 +58,15 @@ def train(args, model, dataloader, logger, setting):
             loss = loss_fn(y.float(), y_hat)
             optimizer.zero_grad()
             loss.backward()
+            lr_sched.step()
             optimizer.step()
             total_loss += loss.item()
             batch += 1
         valid_loss = valid(args, model, dataloader, loss_fn)
+        lr_now = lr_sched.get_last_lr()
         print(
-            f'Epoch: {epoch+1}, Train_loss: {total_loss/batch:.3f}, valid_loss: {valid_loss:.3f}')
+            f'Epoch: {epoch+1}, Train_loss: {total_loss/batch:.3f}, valid_loss: {valid_loss:.3f}, lr: {lr_now}')
+
         logger.log(epoch=epoch+1, train_loss=total_loss /
                    batch, valid_loss=valid_loss)
         wandb.log({'Train_loss': total_loss/batch, 'valid_loss': valid_loss})
@@ -79,7 +87,8 @@ def valid(args, model, dataloader, loss_fn):
 
     for idx, data in enumerate(dataloader['valid_dataloader']):
         if args.model == 'CNN_FM':
-            x, y = [data['user_isbn_vector'].to(args.device), data['img_vector'].to(args.device)], data['label'].to(args.device)
+            x, y = [data['user_isbn_vector'].to(args.device), data['img_vector'].to(
+                args.device)], data['label'].to(args.device)
         elif args.model == 'DeepCoNN':
             x, y = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)
         elif args.model == 'ROP_CNN':
@@ -105,7 +114,8 @@ def test(args, model, dataloader, setting):
 
     for idx, data in enumerate(dataloader['test_dataloader']):
         if args.model == 'CNN_FM':
-            x, _ = [data['user_isbn_vector'].to(args.device), data['img_vector'].to(args.device)], data['label'].to(args.device)
+            x, _ = [data['user_isbn_vector'].to(args.device), data['img_vector'].to(
+                args.device)], data['label'].to(args.device)
         elif args.model == 'DeepCoNN':
             x, _ = [data['user_isbn_vector'].to(args.device), data['user_summary_merge_vector'].to(args.device), data['item_summary_vector'].to(args.device)], data['label'].to(args.device)
         elif args.model == 'ROP_CNN':
