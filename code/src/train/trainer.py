@@ -33,6 +33,9 @@ def train(args, model, dataloader, logger, setting):
     else:
         pass
 
+    lr_sched = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
+        optimizer, T_0=1, T_mult=1, eta_min=0.01, last_epoch=-1)
+
     wandb.watch(models=model, criterion=loss_fn, log='all')
 
     for epoch in tqdm.tqdm(range(args.epochs)):
@@ -54,12 +57,14 @@ def train(args, model, dataloader, logger, setting):
             loss = loss_fn(y.float(), y_hat)
             optimizer.zero_grad()
             loss.backward()
+            lr_sched.step()
             optimizer.step()
             total_loss += loss.item()
             batch += 1
         valid_loss = valid(args, model, dataloader, loss_fn)
+        lr_now = lr_sched.get_last_lr()
         print(
-            f'Epoch: {epoch+1}, Train_loss: {total_loss/batch:.3f}, valid_loss: {valid_loss:.3f}')
+            f'Epoch: {epoch+1}, Train_loss: {total_loss/batch:.3f}, valid_loss: {valid_loss:.3f}, lr: {lr_now}')
         logger.log(epoch=epoch+1, train_loss=total_loss /
                    batch, valid_loss=valid_loss)
         wandb.log({'Train_loss': total_loss/batch, 'valid_loss': valid_loss})
