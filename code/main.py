@@ -16,6 +16,7 @@ def main(args):
     global wandb_id
     wandb_id = wandb.util.generate_id()
     config = {
+
         "model": args.model,
         "data_shuffle": args.data_shuffle,
         "batch_size": args.batch_size,
@@ -48,6 +49,7 @@ def main(args):
 
 
     # DATA LOAD
+
     print(f'--------------- {args.model} Load Data ---------------')
     if args.model in ('FM', 'FFM'):
         data = context_data_load(args)
@@ -59,6 +61,7 @@ def main(args):
         import nltk
         nltk.download('punkt')
         data = text_data_load(args)
+
     elif args.model == 'ROP_CNN':
         import nltk
         nltk.download('punkt')
@@ -84,6 +87,7 @@ def main(args):
     elif args.model=='DeepCoNN':
         data = text_data_split(args, data)
         data = text_data_loader(args, data)
+
         
     elif args.model=='ROP_CNN':
         data = text_data_split(args, data)
@@ -100,7 +104,7 @@ def main(args):
 
     logger = Logger(args, log_path)
     logger.save_args()
-    
+
     ######################## Model
     print(f'--------------- INIT {args.model} ---------------')
     model = models_load(args,data)
@@ -119,7 +123,9 @@ def main(args):
     ######################## SAVE PREDICT
     print(f'--------------- SAVE {args.model} PREDICT ---------------')
     submission = pd.read_csv(args.data_path + 'sample_submission.csv')
+
     if args.model in ('FM', 'FFM', 'NCF', 'WDN', 'DCN', 'CNN_FM', 'DeepCoNN', 'ROP_CNN'):
+
         submission['rating'] = predicts
     else:
         pass
@@ -129,6 +135,7 @@ def main(args):
 
 
 if __name__ == "__main__":
+
 
 
     # BASIC ENVIRONMENT SETUP
@@ -211,6 +218,7 @@ if __name__ == "__main__":
         help='DEEP_CONN,ROP_CNN에서 1D conv의 입력 크기를 조정할 수 있습니다.')
     arg('--out_dim', type=int, default=32,
         help='DEEP_CONN,ROP_CNN에서 1D conv의 출력 크기를 조정할 수 있습니다.')
+
 
     args = parser.parse_args()
     main(args)
