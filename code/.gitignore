@@ -6,7 +6,8 @@ submit/
 wandb/
 /data/
 run_scripts.sh
-
+xgb_base.csv
+catboost_info/
 # Created by https://www.toptal.com/developers/gitignore/api/linux,visualstudiocode,python
 # Edit at https://www.toptal.com/developers/gitignore?templates=linux,visualstudiocode,python
 

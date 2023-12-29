@@ -193,7 +193,7 @@ def context_data_load(args):
 # # feat siyun 
 # # args.model이 FFM이면 field_dims를 새로만든 columns을 필드로 추가합니다.
 # 여러 변수를 고려해서 큰 의미가 없다고 판단되는 변수는 제거하겠습니다.
-    if args.model == 'FFM':
+    if hasattr(args, 'model') and args.model == 'FFM':
         field_dims = np.array([len(user2idx), len(isbn2idx),
                            10, len(idx['loc_city2idx']), len(idx['loc_state2idx']), len(idx['loc_country2idx']),
                            len(idx['category2idx']), len(idx['publisher2idx']), len(idx['language2idx']), 

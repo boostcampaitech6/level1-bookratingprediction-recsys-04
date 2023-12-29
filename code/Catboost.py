@@ -31,7 +31,7 @@ from sklearn.metrics import mean_absolute_error
 warnings.filterwarnings(action='ignore')
 
 
-path='../data/'    # feat siyun - 디렉토리 해당 파일에 맞게 변경 필요
+path='../code/data/'    # feat siyun - 디렉토리 해당 파일에 맞게 변경 필요
 
 users = pd.read_csv(path+'users.csv')
 books = pd.read_csv(path+'books.csv')
